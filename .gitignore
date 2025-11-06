@@ -1,0 +1,78 @@
+# ====================
+# Python / Django
+# ====================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+backend/venv/
+backend/.venv/
+backend/env/
+backend/ENV/
+backend/venv.bak/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+celerybeat-schedule
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Type checkers
+.mypy_cache/
+.pyre/
+
+# ====================
+# Node / Frontend
+# ====================
+frontend/node_modules/
+frontend/.env
+frontend/build/
+frontend/dist/
+
+# ====================
+# IDEs / Editors
+# ====================
+.vscode/
+.idea/
+.ropeproject/
+
+# ====================
+# OS Files
+# ====================
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ====================
+# Docker
+# ====================
+docker-compose.override.yml
+docker-compose.*.yml
+/*.env
+
+# ====================
+# Misc
+# ====================
+*.pot
+*.mo
+*.log
