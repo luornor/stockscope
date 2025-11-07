@@ -74,13 +74,33 @@ WSGI_APPLICATION = 'stock_scope.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+# --- Local Postgres defaults (docker-compose) ---
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+
+LOCAL_DB_URL = (
+    f"postgres://{DB_USER}:{DB_PASSWORD}@"
+    f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
+)
+
+# If DATABASE_URL is present (e.g., on Render/Aiven), use it; else use local
+DB_URL = os.getenv("DATABASE_URL", LOCAL_DB_URL)
+
+# Require SSL automatically when using a cloud DB (DATABASE_URL present),
+# or override explicitly with DB_SSL_REQUIRE=1/0
+SSL_REQUIRE = (os.getenv("DB_SSL_REQUIRE")
+               or ("1" if os.getenv("DATABASE_URL") else "0")) == "1"
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.parse(
+        DB_URL,
+        conn_max_age=600,
+        ssl_require=SSL_REQUIRE,
+    )
 }
 
 STATIC_URL = 'static/'
