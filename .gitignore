@@ -10,7 +10,7 @@ backend/venv/
 backend/.venv/
 backend/env/
 backend/ENV/
-backend/venv.bak/
+backend/.env
 
 # Distribution / packaging
 build/
