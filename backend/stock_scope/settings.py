@@ -23,7 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret')
 DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() == 'true'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
-
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if os.getenv('CORS_ALLOWED_ORIGINS') else []
+CORS_ALLOW_ALL_ORIGINS = not CORS_ALLOWED_ORIGINS
 
 # Application definition
 
@@ -36,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'accounts'
+    'accounts',
+    # market
     
 ]
 
@@ -103,16 +105,36 @@ DATABASES = {
     )
 }
 
-STATIC_URL = 'static/'
-
-
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if os.getenv('CORS_ALLOWED_ORIGINS') else []
-CORS_ALLOW_ALL_ORIGINS = not CORS_ALLOWED_ORIGINS
-
-
+# DRF uses JWT from HttpOnly cookies
 REST_FRAMEWORK = {
 'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],
 }
+
+REST_FRAMEWORK.update({
+'DEFAULT_AUTHENTICATION_CLASSES': (
+'accounts.authentication.CookieJWTAuthentication',
+),
+})
+
+
+# Simple JWT config
+SIMPLE_JWT = {
+'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_ACCESS_MINUTES'))),
+'REFRESH_TOKEN_LIFETIME': timedelta(days=int(os.getenv('JWT_REFRESH_DAYS'))),
+'SIGNING_KEY': os.getenv('DJANGO_SECRET_KEY', 'dev-secret'),
+'ALGORITHM': 'HS256',
+}
+
+# Google OAuth
+GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
+FRONTEND_APP_URL = os.getenv('FRONTEND_APP_URL', 'http://localhost:3000')
+
+
+# Cookie settings
+SESSION_COOKIE_SECURE = os.getenv('COOKIE_SECURE', 'false').lower() == 'true'
+JWT_COOKIE_DOMAIN = os.getenv('JWT_COOKIE_DOMAIN', '') or None # e.g. ".yourdomain.com"
+JWT_COOKIE_SAMESITE = os.getenv('JWT_COOKIE_SAMESITE', 'Lax') # Lax|Strict|None
 
 
 # Provider keys
@@ -155,6 +177,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

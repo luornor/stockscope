@@ -7,3 +7,6 @@ pandas
 python-dotenv
 gunicorn
 whitenoise
+google-auth
+requests-oauthlib
+djangorestframework-simplejwt
