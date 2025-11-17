@@ -6,8 +6,8 @@ export async function apiGet<T = unknown>(path: string): Promise<T> {
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
-
-export async function apiPost<T = unknown>(path: string, body?: any): Promise<T> {
+ 
+export async function apiPost<T = unknown>(path: string, body?: unknown): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     credentials: "include",

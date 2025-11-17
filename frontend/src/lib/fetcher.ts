@@ -10,7 +10,7 @@ export async function get(path: string) {
   return res.json();
 }
 
-export async function post(path: string, body?: any) {
+export async function post(path: string, body?: unknown) {
   const res = await fetch(`${API_BASE}${path}`, {
     method: "POST",
     credentials: "include",

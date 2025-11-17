@@ -10,3 +10,4 @@ whitenoise
 google-auth
 requests-oauthlib
 djangorestframework-simplejwt
+dj_database_url
