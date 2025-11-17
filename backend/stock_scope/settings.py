@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'stock_scope.wsgi.application'
 # Database
 
 # --- Local Postgres defaults (docker-compose) ---
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("POSTGRES_DB")
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("POSTGRES_HOST")
+DB_PORT = os.getenv("POSTGRES_PORT")
 
 LOCAL_DB_URL = (
     f"postgres://{DB_USER}:{DB_PASSWORD}@"
@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
 
 REST_FRAMEWORK.update({
 'DEFAULT_AUTHENTICATION_CLASSES': (
-'accounts.authentication.CookieJWTAuthentication',
+'accounts.authenticate.CookieJWTAuthentication',
 ),
 })
 
@@ -133,7 +133,7 @@ SIMPLE_JWT = {
 'ALGORITHM': 'HS256',
 }
 
-# Google OAuth
+# Google OAuth/GSI
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
 FRONTEND_APP_URL = os.getenv('FRONTEND_APP_URL', 'http://localhost:3000')
