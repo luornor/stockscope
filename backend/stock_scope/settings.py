@@ -118,11 +118,17 @@ REST_FRAMEWORK.update({
 ),
 })
 
+def _int_env(name, default):
+    v = os.getenv(name)
+    try:
+        return int(v) if v is not None else default
+    except (TypeError, ValueError):
+        return default
 
 # Simple JWT config
 SIMPLE_JWT = {
-'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_ACCESS_MINUTES'))),
-'REFRESH_TOKEN_LIFETIME': timedelta(days=int(os.getenv('JWT_REFRESH_DAYS'))),
+'ACCESS_TOKEN_LIFETIME': timedelta(minutes=_int_env('JWT_ACCESS_MINUTES', 5)),
+'REFRESH_TOKEN_LIFETIME': timedelta(days=_int_env('JWT_REFRESH_DAYS', 1)),
 'SIGNING_KEY': os.getenv('DJANGO_SECRET_KEY', 'dev-secret'),
 'ALGORITHM': 'HS256',
 }
