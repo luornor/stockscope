@@ -46,7 +46,7 @@ export default function LoginPage() {
             </ul>
 
             <div className="mt-7 md:mt-8">
-              <GoogleLoginButton />
+              <GoogleLoginButton next="/dashboard" />
               <p className="mt-3 flex items-center gap-2 text-xs text-neutral-400 md:text-[0.8rem]">
                 <Lock className="h-3.5 w-3.5" />
                 We only use your email to create your account.
