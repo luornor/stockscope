@@ -10,8 +10,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from .auth import verify_id_token
 from .utils import set_jwt_cookies, clear_jwt_cookies, REFRESH_NAME
+from django.http import HttpResponse
 
 User = get_user_model()
+
+def health(request):
+    return HttpResponse("OK", status=200)
+
 
 # --- One Tap / GSI ---
 @csrf_exempt
