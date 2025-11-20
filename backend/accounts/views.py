@@ -11,7 +11,7 @@ from django.conf import settings
 from .auth import verify_id_token
 from .utils import set_jwt_cookies, clear_jwt_cookies, REFRESH_NAME
 from django.http import HttpResponse
-
+import json, logging
 User = get_user_model()
 
 def health(request):
@@ -19,6 +19,8 @@ def health(request):
 
 
 # --- One Tap / GSI ---
+logger = logging.getLogger(__name__)
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -32,16 +34,18 @@ def google_onetap(request):
         origin = request.headers.get('Origin')
         allowed = [o.strip() for o in (settings.CORS_ALLOWED_ORIGINS or []) if o.strip()]
         if allowed and origin and origin not in allowed:
-            return HttpResponseBadRequest('invalid origin')
+            return JsonResponse({"detail":"Invalid origin"}, status=400)
 
-        id_token_val = (request.data or {}).get('id_token')
-        if not id_token_val:
-            return HttpResponseBadRequest('missing id_token')
+        payload = json.loads(request.body or "{}")
+        tok = payload.get("credential")
+        if not tok:
+            return JsonResponse({"detail":"Missing credential"}, status=400)
 
-        idinfo = verify_id_token(id_token_val)  # validates aud == GOOGLE_OAUTH_CLIENT_ID
+
+        idinfo = verify_id_token(tok)  # validates aud == GOOGLE_OAUTH_CLIENT_ID
         email = idinfo.get('email')
         if not email:
-            return HttpResponseBadRequest('no email in id_token')
+            return JsonResponse({"detail":"No email in id_token"}, status=400)
 
         user, created = User.objects.get_or_create(username=email, defaults={'email': email})
         if created:
@@ -56,7 +60,7 @@ def google_onetap(request):
         return resp
 
     except Exception as e:
-        return HttpResponseBadRequest(str(e))
+        return JsonResponse({"detail": str(e)}, status=400)
 
 
 # --- Authenticated utilities ---

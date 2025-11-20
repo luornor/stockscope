@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Spinner from "@/components/Spinner";
-import { API_BASE } from "@/lib/api";
+import {apiPost} from "@/lib/api";
 
 type GoogleCredentialResponse = { credential?: string };
 
@@ -51,12 +51,7 @@ export default function GoogleLoginButton({ next = "/dashboard" }: { next?: stri
           setError(null);
           setLoading(true);
           try {
-            const r = await fetch(`${API_BASE}/api/auth/google/onetap`, {
-              method: "POST",
-              credentials: "include", // set HttpOnly cookies
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id_token: credential }),
-            });
+            const r = (await apiPost("/api/auth/google/onetap", { credential })) as Response;
 
             let data: { error?: string; detail?: string } | null = null;
             try { data = (await r.json()) as { error?: string; detail?: string } | null; } catch {}
