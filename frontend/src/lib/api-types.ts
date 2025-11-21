@@ -16,7 +16,7 @@ volume: number; // latest volume
 export interface IntradayPoint { t: string; price: number }
 
 
-export interface SectorSlice { name: string; value: number; [key: string]: any }
+export interface SectorSlice { name: string; value: number; [key: string]: unknown }
 
 
 export interface NewsItem { id: string | number; source: string; title: string; time: string }
