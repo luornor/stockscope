@@ -1,6 +1,7 @@
 // ============================
 // src/components/dashboard/SectorSplit.tsx (BACKEND: /api/portfolio/sectors)
 // ============================
+"use client";
 import React from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import type { SectorSlice } from '@/lib/api-types';
