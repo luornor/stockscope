@@ -5,7 +5,7 @@ import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tool
 
 
 
-export function SmallSpark({ dataKey, data }: { dataKey: string; data: any[] }) {
+export function SmallSpark({ dataKey, data }: { dataKey: string; data: unknown[] }) {
   return (
     <ResponsiveContainer width="100%" height={52}>
       <AreaChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
