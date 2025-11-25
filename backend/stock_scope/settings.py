@@ -137,8 +137,6 @@ SIMPLE_JWT = {
 
 # Google OAuth/GSI
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
-FRONTEND_APP_URL = os.getenv('FRONTEND_APP_URL', 'http://localhost:3000')
-
 
 # Cookie settings
 SESSION_COOKIE_SECURE = os.getenv('COOKIE_SECURE', 'false').lower() == 'true'

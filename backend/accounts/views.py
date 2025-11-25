@@ -1,5 +1,5 @@
 from __future__ import annotations
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
 
