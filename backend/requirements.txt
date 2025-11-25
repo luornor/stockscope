@@ -14,3 +14,4 @@ dj_database_url
 psycopg2
 redis
 celery
+pydantic
