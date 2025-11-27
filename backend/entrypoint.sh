@@ -65,10 +65,6 @@ python --version
 echo "Running migrations..."
 python manage.py migrate --noinput --verbosity 2
 
-echo "⚠ Forcing auth migrations..."
-python manage.py migrate auth zero
-python manage.py migrate auth
-
 
 echo "Collecting static..."
 python manage.py collectstatic --noinput
