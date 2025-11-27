@@ -10,7 +10,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libpq-dev \
-    postgresql-client \
+    postgresql-client postgresql-client-common \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

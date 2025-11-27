@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     
 ]
 
-AUTH_USER_MODEL = "accounts.User"
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
