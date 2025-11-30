@@ -21,5 +21,6 @@ from accounts.views import health
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include(('accounts.urls', 'accounts'), namespace='accounts')),
+    path('api/', include('market.urls')),
     path('', health),
 ]

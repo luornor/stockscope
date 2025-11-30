@@ -151,8 +151,14 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Provider keys
 ALPHA_VANTAGE_KEY = os.getenv('ALPHA_VANTAGE_KEY')
+ALPHA_BASE_URL = os.getenv('ALPHA_BASE_URL')
 FINNHUB_KEY = os.getenv('FINNHUB_KEY')
-PROVIDER_FALLBACK = os.getenv('PROVIDER_FALLBACK', 'YAHOO') # YAHOO | ALPHA | FINNHUB
+PROVIDER_FALLBACK = os.getenv('PROVIDER_FALLBACK') # YAHOO | ALPHA | FINNHUB
+# settings.py
+KWAYISI_GSE_BASE = os.getenv("KWAYISI_GSE_BASE")
+PROVIDER_GHANA = os.getenv("PROVIDER_GHANA")   # KWAYISI | YAHOO | ALPHA
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
