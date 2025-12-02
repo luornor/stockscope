@@ -57,12 +57,23 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[radial-gradient(1200px_800px_at_80%_-10%,rgba(34,211,238,0.15),transparent),radial-gradient(1000px_600px_at_-10%_0%,rgba(168,85,247,0.10),transparent)] bg-slate-950 text-slate-100">
       <Header onMenu={() => setSidebarOpen(!sidebarOpen)} />
+      {/* Mobile overlay to close the sidebar */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          aria-hidden="true"
+        />
+      )}
+      <div className="pt-14 md:pt-16">
+
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 md:grid md:grid-cols-[18rem_1fr] md:gap-6">
         <Sidebar
           open={sidebarOpen}
           setMarket={setMarket}
           market={market}
           onSelectSection={setSection}
+          onClose={() => setSidebarOpen(false)}
         />
 
         <main className="mt-6 md:mt-10 w-full">
@@ -275,6 +286,7 @@ export default function DashboardPage() {
             Live backend • © Stock-Scope
           </div>
         </main>
+      </div>
       </div>
     </div>
   );

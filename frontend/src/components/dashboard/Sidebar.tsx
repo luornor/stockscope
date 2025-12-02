@@ -21,11 +21,14 @@ export function Sidebar({
   setMarket,
   market,
   onSelectSection,
+  onClose,
 }: {
   open: boolean;
   setMarket: (m: Market) => void;
   market: Market;
   onSelectSection: (s: "overview" | "news" | "watchlist") => void;
+  onClose?: () => void;    // NEW
+
 }) {
   const links = [
     { label: "Overview", icon: LayoutGrid, key: "overview" },
@@ -58,7 +61,10 @@ export function Sidebar({
 
         <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => setMarket("international")}
+            onClick={() => {
+              setMarket("international");
+              onClose?.();          // close on mobile
+            }}
             className={cx(
               "flex items-center gap-2 rounded-2xl px-3 py-2 border text-sm",
               market === "international"
@@ -69,7 +75,10 @@ export function Sidebar({
             <Globe2 className="size-4" /> International
           </button>
           <button
-            onClick={() => setMarket("ghana")}
+            onClick={() => {
+              setMarket("ghana");
+              onClose?.();     // close on mobile
+            }}
             className={cx(
               "flex items-center gap-2 rounded-2xl px-3 py-2 border text-sm",
               market === "ghana"
@@ -87,7 +96,10 @@ export function Sidebar({
           {links.map((l) => (
             <button
               key={l.label}
-              onClick={() => onSelectSection(l.key as "overview" | "news" | "watchlist")}
+              onClick={() => {
+                onSelectSection(l.key as "overview" | "news" | "watchlist");
+                onClose?.();
+              }}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5"
             >
               <l.icon className="size-4 text-slate-300" />
