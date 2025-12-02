@@ -34,6 +34,3 @@ class WatchlistItemSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
 
 
-class SectorSliceSerializer(serializers.Serializer):
-    name = serializers.CharField()
-    value = serializers.FloatField()  # percent (0-100)

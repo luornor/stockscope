@@ -1,9 +1,8 @@
 # market/urls.py
 from django import views
 from django.urls import path
-from .views import (portfolio_sectors, quotes, intraday, news, symbols, watchlist_delete,
-                    watchlist_list, watchlist_add, watchlist_delete,
-                    portfolio_sectors, movers)
+from .views import (quotes, intraday, news, symbols, watchlist_delete,
+                    watchlist_list, watchlist_add, watchlist_delete,movers)
 
 urlpatterns = [
     path("quotes", quotes),  # /api/quotes?market=international
@@ -16,6 +15,4 @@ urlpatterns = [
     path("watchlist", watchlist_list),
     path("watchlist/add", watchlist_add),
     path("watchlist/<str:symbol>", watchlist_delete),
-
-    path("portfolio/sectors", portfolio_sectors),
 ]

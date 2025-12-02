@@ -7,7 +7,7 @@ from rest_framework import status
 from .models import WatchlistItem
 from .serializers import (
     QuoteSerializer,IntradayPointSerializer,NewsItemSerializer,
-    SymbolSerializer, WatchlistItemSerializer, SectorSliceSerializer
+    SymbolSerializer, WatchlistItemSerializer
 )
 from .symbols import get_symbols_for_market
 
@@ -200,21 +200,3 @@ def watchlist_delete(request, symbol: str):
     return Response({"ok": True})
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def portfolio_sectors(request):
-    """
-    GET /api/portfolio/sectors
-    Returns [{name, value}] sum=100
-    TODO: Replace with real user holdings aggregation.
-    """
-    demo = [
-        {"name":"Tech","value":38.0},
-        {"name":"Finance","value":22.0},
-        {"name":"Energy","value":9.0},
-        {"name":"Health","value":12.0},
-        {"name":"Consumer","value":19.0},
-        ]
-    ser = SectorSliceSerializer(data=demo, many=True)
-    ser.is_valid(raise_exception=True)
-    return Response(ser.data)
