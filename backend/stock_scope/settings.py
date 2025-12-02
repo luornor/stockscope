@@ -110,6 +110,16 @@ DATABASES = {
     )
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+        "TIMEOUT": 300,  # default; we set explicit TTLs per set()
+    }
+}
+
+
 # DRF uses JWT from HttpOnly cookies
 REST_FRAMEWORK = {
 'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer'],

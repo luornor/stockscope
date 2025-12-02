@@ -4,8 +4,13 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional, Tuple
 
 import yfinance as yf
-import requests,os, time, hashlib,feedparser
+import requests,os, time, hashlib,feedparser,json
 from datetime import datetime, timedelta, timezone
+
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from django.core.cache import cache
+from rest_framework.exceptions import APIException
 
 
 ALPHA_KEY = os.getenv("ALPHA_VANTAGE_KEY")
@@ -409,6 +414,28 @@ class GhanaRssNewsProvider:
         return out
 
 
+class UpstreamUnavailable(APIException):
+    status_code = 503
+    default_detail = "Upstream (GSE) temporarily unavailable. Please try again."
+    default_code = "upstream_unavailable"
+
+# one-time session with retries
+_retry = Retry(
+    total=3,
+    connect=2,
+    read=2,
+    backoff_factor=0.5,         # 0.5s, 1s, 2s
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=frozenset(["GET"]),
+)
+_session = requests.Session()
+_session.mount("https://", HTTPAdapter(max_retries=_retry))
+_session.mount("http://", HTTPAdapter(max_retries=_retry))
+
+class SymbolsProvider:
+    INTL = [...]  # your existing list
+
+
 
 class SymbolsProvider:
     """Lists symbols for a market. Ghana via Kwayisi; international is curated."""
@@ -419,29 +446,36 @@ class SymbolsProvider:
         {"symbol":"TSLA","name":"Tesla"},
         {"symbol":"AMZN","name":"Amazon"},
     ]
-    @staticmethod
-    def ghana():
+    @classmethod
+    def ghana(cls):
+        """
+        Return cached list of GSE symbols. Refresh every 6h.
+        Serve stale cache on upstream failures.
+        """
+        cache_key = "gse:equities:v1"
+        cached = cache.get(cache_key)
         try:
-            r = requests.get(f"{KWAYISI_BASE}/equities", timeout=12)
+            # separate connect/read timeouts: connect=3s, read=7s
+            r = _session.get(f"{KWAYISI_BASE}/equities", timeout=(3.05, 7))
             r.raise_for_status()
-            data = r.json() or []
-            # Kwayisi returns array of dicts; normalise minimally
-            out = []
-            for row in data:
-                sym = (row.get("name") or row.get("symbol") or "").strip().upper()
-                nm  = (row.get("fullname") or row.get("company") or sym)
-                if sym:
-                    out.append({"symbol": sym, "name": nm})
+            data = r.json()  # expected array of dicts
+            # normalize to your structure
+            out = [
+                {"symbol": it.get("symbol") or it.get("ticker"),
+                 "name": it.get("name") or it.get("company") or "",
+                 "market": "ghana"}
+                for it in data
+                if (it.get("symbol") or it.get("ticker"))
+            ]
+            # write-through cache for 6 hours
+            cache.set(cache_key, out, 6 * 60 * 60)
             return out
         except Exception:
-            # fallback to a tiny starter set
-            return [
-                {"symbol":"MTNGH","name":"MTN Ghana"},
-                {"symbol":"GCB","name":"GCB Bank"},
-                {"symbol":"CAL","name":"CAL Bank"},
-                {"symbol":"SIC","name":"SIC Insurance"},
-                {"symbol":"EGL","name":"Enterprise Group"},
-            ]
+            if cached:
+                # serve stale cache instead of timing out
+                return cached
+            # no cache → fail fast with a 503 (won't hang the worker)
+            raise UpstreamUnavailable()
 
     @classmethod
     def list(cls, market: str):

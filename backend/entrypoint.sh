@@ -70,4 +70,17 @@ echo "Collecting static..."
 python manage.py collectstatic --noinput
 
 echo "Starting server..."
-exec gunicorn stock_scope.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers "${WEB_CONCURRENCY:-2}"
+exec gunicorn stock_scope.wsgi:application \
+  --bind 0.0.0.0:${PORT:-8000} \
+  --workers 2 \
+  --worker-class gthread \
+  --threads 4 \
+  --timeout 60 \
+  --graceful-timeout 30 \
+  --keep-alive 5 \
+  --max-requests 1000 \
+  --max-requests-jitter 100 \
+  --worker-tmp-dir /dev/shm \
+  --log-level info \
+  --access-logfile - \
+  --error-logfile -
