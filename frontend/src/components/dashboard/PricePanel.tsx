@@ -7,7 +7,13 @@ function cx(...classes: Array<string | false | undefined>) {
 
 function pct(nPrice: number, nChange: number) {
   // change% = change / (price - change) * 100 ; guard against /0
-  if (!isFinite(nPrice) || !isFinite(nChange) || nPrice === 0 || nPrice === nChange) return 0;
+  if (
+    !isFinite(nPrice) ||
+    !isFinite(nChange) ||
+    nPrice === 0 ||
+    nPrice === nChange
+  )
+    return 0;
   const v = (nChange / (nPrice - nChange)) * 100;
   return isFinite(v) ? v : 0;
 }
@@ -50,7 +56,7 @@ export function PricePanel({
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2 p-2">
         {quotes.map((s) => {
           const p = Number(s.price ?? 0);
           const ch = Number(s.change ?? 0);

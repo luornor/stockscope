@@ -87,7 +87,7 @@ export function Sidebar({
           {links.map((l) => (
             <button
               key={l.label}
-              onClick={() => onSelectSection(l.key as any)}
+              onClick={() => onSelectSection(l.key as "overview" | "news" | "watchlist")}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5"
             >
               <l.icon className="size-4 text-slate-300" />

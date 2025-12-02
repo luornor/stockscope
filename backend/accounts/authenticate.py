@@ -1,21 +1,21 @@
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from .utils import ACCESS_NAME
+from rest_framework.authentication import BaseAuthentication
+from rest_framework_simplejwt.tokens import AccessToken
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
-
-class CookieJWTAuthentication(JWTAuthentication):
-    """Read JWT from HttpOnly cookies by default (fallback to Authorization header)."""
-
+class CookieJWTAuthentication(BaseAuthentication):
+    ACCESS_NAME = ACCESS_NAME
     def authenticate(self, request):
-        header = self.get_header(request)
-        if header is None:
-            raw_token = request.COOKIES.get(ACCESS_NAME)
-        else:
-            raw_token = self.get_raw_token(header)
-        if raw_token is None:
+        token = request.COOKIES.get(self.ACCESS_NAME)
+        if not token:
+            return None  # <- silent: no token
+
+        try:
+            at = AccessToken(token)
+            uid = at.get("user_id")
+            user = User.objects.get(id=uid)
+            return (user, None)
+        except Exception:
+            # IMPORTANT: be silent so AllowAny endpoints (refresh/onetap) still work
             return None
-        validated_token = self.get_validated_token(raw_token)
-        
-        return self.get_user(validated_token), validated_token
-    
-    
-    

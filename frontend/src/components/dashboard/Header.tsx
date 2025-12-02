@@ -3,13 +3,11 @@ import React from "react";
 import { Menu, Rocket } from "lucide-react";
 import Link from "next/link";
 import { apiGet } from "@/lib/api";
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
 type Me = { email: string; username: string };
 
 export function Header({ onMenu }: { onMenu: () => void }) {
-  const router = useRouter();
   const { data } = useQuery({
     queryKey: ["me"],
     queryFn: () => apiGet<Me>("/api/auth/me"),
