@@ -16,3 +16,4 @@ redis
 celery
 pydantic
 feedparser>=6.0.10
+django-redis>=5.4.0
