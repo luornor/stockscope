@@ -5,7 +5,16 @@ import React from 'react';
 import type { NewsItem } from '@/lib/api-types';
 import { Newspaper } from 'lucide-react';
 
-export function NewsList({ items }: { items: NewsItem[] }) {  return (
+export function NewsList({ items }: { items: NewsItem[] }) {
+  if (!items?.length) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-400">
+        No recent headlines for this market.
+      </div>
+    );
+  }
+
+  return (
     <div className="rounded-2xl border border-white/10 overflow-hidden">
       <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2 bg-white/5">
         <Newspaper className="size-4 text-fuchsia-300"/> <div className="font-medium text-slate-100">Latest News</div>

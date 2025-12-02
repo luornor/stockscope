@@ -19,7 +19,7 @@ function pctBadge(n: number) {
   );
 }
 
-export function StatCard({ title, value, delta, subtle }: { title: string; value: string; delta?: number; subtle?: boolean }) {
+export function   StatCard({ title, value, delta, subtle }: { title: string; value: string; delta?: number; subtle?: boolean }) {
   return (
     <div className={cx(
       "rounded-2xl border p-4 md:p-5",

@@ -93,3 +93,22 @@ def logout_view(request):
     resp = JsonResponse({'ok': True})
     clear_jwt_cookies(resp)
     return resp
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    """
+    Permanently delete the authenticated user's account
+    and clear JWT cookies.
+    """
+    user = request.user
+
+    # Clear the cookies first
+    resp = JsonResponse({"detail": "Account deleted."})
+    clear_jwt_cookies(resp)
+
+    # Delete the user from the database
+    user.delete()
+
+    return resp

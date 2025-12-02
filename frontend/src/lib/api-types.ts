@@ -20,12 +20,3 @@ export interface SectorSlice { name: string; value: number; [key: string]: unkno
 
 
 export interface NewsItem { id: string | number; source: string; title: string; time: string }
-
-
-// Backend endpoints you’ll likely expose later:
-// GET /api/quotes?market=ghana|international -> Quote[]
-// GET /api/quotes/intraday?symbol=AAPL&interval=1m -> IntradayPoint[]
-// GET /api/movers?market=ghana|international -> Quote[] (top movers)
-// GET /api/watchlist -> Quote[] for current user
-// GET /api/portfolio/sectors -> SectorSlice[]
-// GET /api/news?market=ghana|international -> NewsItem[]

@@ -11,6 +11,15 @@ function cx(...classes: Array<string | false | undefined>) {
 }
 
 export function Movers({ data, spark = [] }: { data: Quote[]; spark?: { t: string; a: number }[] }) {  const sorted = useMemo(() => [...data].sort((a, b) => Math.abs((b.change / b.price)) - Math.abs((a.change / a.price))), [data]);
+  // inside NewsList
+if (!sorted?.length) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-400">
+      No recent movers right now.
+    </div>
+  );
+}
+
   return (
     <div className="rounded-2xl border border-white/10 overflow-hidden">
       <div className="px-4 py-3 border-b border-white/10 flex items-center gap-2 bg-white/5">

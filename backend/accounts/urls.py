@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import google_onetap, me, refresh, logout_view
+from .views import google_onetap, me, refresh, logout_view, delete_account
 
 
 urlpatterns = [
@@ -7,4 +7,5 @@ urlpatterns = [
     path('me',me,name='me'),
     path('refresh',refresh,name='refresh'),
     path('logout',logout_view,name='logout'),
+    path('delete', delete_account, name='delete_account'),
 ]
