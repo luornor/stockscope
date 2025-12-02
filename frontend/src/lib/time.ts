@@ -8,6 +8,5 @@ export function toRelative(ts: string | Date): string {
   if (m < 60) return rtf.format(-Math.round(diff / 60), "minute");
   const h = m / 60;
   if (h < 24) return rtf.format(-Math.round(diff / 3600), "hour");
-  const dys = h / 24;
   return rtf.format(-Math.round(diff / 86400), "day");
 }

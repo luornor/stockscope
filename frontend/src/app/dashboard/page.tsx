@@ -14,8 +14,12 @@ import { useMovers } from "@/hooks/useMovers";
 import { useNews } from "@/hooks/useNews";
 import { SymbolPicker } from "@/components/dashboard/SymbolPicker";
 import { WatchlistButton } from "@/components/dashboard/WatchlistButton";
-import { Watchlist } from "@/components/dashboard/Watchlist";
 import WatchlistView from "@/components/dashboard/Watchlistview";
+
+const defaultByMarket: Record<Market, string> = {
+    international: "AAPL",
+    ghana: "MTNGH",
+  };
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,10 +28,6 @@ export default function DashboardPage() {
     "overview" | "news" | "watchlist" | "charts"
   >("overview");
 
-  const defaultByMarket: Record<Market, string> = {
-    international: "AAPL",
-    ghana: "MTNGH",
-  };
   const [symbol, setSymbol] = useState<string>(defaultByMarket[market]);
 
   useEffect(() => {

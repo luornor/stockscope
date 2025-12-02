@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 import { Watchlist } from "@/components/dashboard/Watchlist";
 import { useWatchlist } from "@/hooks/useWatchlist";
-import type { Quote } from "@/lib/api-types";
 
 type Market = "ghana" | "international";
 
