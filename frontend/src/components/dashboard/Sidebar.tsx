@@ -92,7 +92,6 @@ export function Sidebar({
 
         <div className="mt-6 text-xs text-slate-400 mb-2">Shortcuts</div>
         <div className="space-y-1">
-          +{" "}
           {links.map((l) => (
             <button
               key={l.label}
