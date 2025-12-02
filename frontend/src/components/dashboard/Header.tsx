@@ -20,7 +20,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
       "U").toUpperCase();
 
   return (
-    <header className="fixed top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-slate-900/60 bg-slate-900/80 border-b border-white/5">
+    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-slate-900/60 bg-slate-900/80 border-b border-white/5">
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 py-3 flex items-center gap-2">
         {/* Mobile menu */}
         <button
