@@ -1,3 +1,4 @@
+name: stock-scope
 services:
   stockscope_api:
     build: .
