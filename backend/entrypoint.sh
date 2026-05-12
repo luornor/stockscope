@@ -70,4 +70,10 @@ echo "Collecting static..."
 python manage.py collectstatic --noinput
 
 echo "Starting server..."
-exec gunicorn stock_scope.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers "${WEB_CONCURRENCY:-2}"
+exec gunicorn stock_scope.wsgi:application \
+  --bind 0.0.0.0:${PORT:-8000} \
+  --worker-class "${GUNICORN_WORKER_CLASS:-gthread}" \
+  --workers "${WEB_CONCURRENCY:-2}" \
+  --threads "${GUNICORN_THREADS:-4}" \
+  --timeout "${GUNICORN_TIMEOUT:-60}" \
+  --graceful-timeout "${GUNICORN_GRACEFUL_TIMEOUT:-30}"
