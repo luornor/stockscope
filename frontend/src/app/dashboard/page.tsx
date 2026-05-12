@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import type { Market } from "@/lib/api-types";
+import type { Market, Quote } from "@/lib/api-types";
 import { Header } from "@/components/dashboard/Header";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -20,6 +20,18 @@ const defaultByMarket: Record<Market, string> = {
     international: "AAPL",
     ghana: "MTNGH",
   };
+
+function fallbackSeries(q: Quote) {
+  const price = Number(q.price);
+  const change = Number(q.change);
+  if (!Number.isFinite(price) || price <= 0) return [];
+
+  const previous = Number.isFinite(change) ? price - change : price;
+  return [
+    { t: "Prev", price: previous > 0 ? previous : price },
+    { t: "Now", price },
+  ];
+}
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -49,6 +61,10 @@ export default function DashboardPage() {
 
   const { series, isLoading: iLoading } = useIntraday(symbol, market);
   const { movers } = useMovers(market, 6);
+  const chartData = useMemo(
+    () => (series.length ? series : fallbackSeries(picked)),
+    [series, picked]
+  );
   const { news } = useNews(
     market,
     market === "international" ? symbol : undefined
@@ -102,7 +118,7 @@ export default function DashboardPage() {
                       market={market}
                     />
                   </div>
-                  <ChartPanel symbol={picked.symbol} data={series} />
+                  <ChartPanel symbol={picked.symbol} data={chartData} />
                   {iLoading && (
                     <div className="mt-2 text-xs text-slate-500">
                       Loading chart…
@@ -149,7 +165,7 @@ export default function DashboardPage() {
               >
                 <div className="space-y-4">
                   {movers.length || quotes.length ? (
-                    <Movers data={movers.length ? movers : quotes} />
+                    <Movers data={movers.length ? movers : quotes} onSelect={setSymbol} />
                   ) : (
                     <div className="rounded-2xl border border-white/10 p-4 bg-white/5 text-sm text-slate-400">
                       No movers right now for this market.
@@ -166,7 +182,12 @@ export default function DashboardPage() {
 
                 <div className="lg:col-span-2 space-y-4">
                   {quotes.length ? (
-                    <PricePanel market={market} quotes={quotes} />
+                    <PricePanel
+                      market={market}
+                      quotes={quotes}
+                      value={symbol}
+                      onSelect={setSymbol}
+                    />
                   ) : (
                     <div className="rounded-2xl border border-white/10 p-4 bg-white/5 text-sm text-slate-400">
                       No quotes available for this market.
@@ -174,14 +195,7 @@ export default function DashboardPage() {
                   )}
 
                   {news.length ? (
-                    <NewsList
-                      items={news.map((n) => ({
-                        id: n.id,
-                        source: n.source,
-                        title: n.title,
-                        time: n.time,
-                      }))}
-                    />
+                    <NewsList items={news} />
                   ) : (
                     <div className="rounded-2xl border border-white/10 p-4 bg-white/5 text-sm text-slate-400">
                       No recent headlines for this market.
@@ -197,14 +211,7 @@ export default function DashboardPage() {
             <div className="mt-6 space-y-4">
               <div className="text-slate-100 font-medium">Latest News</div>
               {news.length ? (
-                <NewsList
-                  items={news.map((n) => ({
-                    id: n.id,
-                    source: n.source,
-                    title: n.title,
-                    time: n.time,
-                  }))}
-                />
+                <NewsList items={news} />
               ) : (
                 <div className="rounded-2xl border border-white/10 p-4 bg-white/5 text-sm text-slate-400">
                   No recent headlines for this market.
@@ -240,7 +247,7 @@ export default function DashboardPage() {
               {/* Chart + Picker */}
               <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                 <div className="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <ChartPanel symbol={symbol} data={series} />
+                  <ChartPanel symbol={symbol} data={chartData} />
                   {iLoading && (
                     <div className="mt-2 text-xs text-slate-500">
                       Loading chart…
@@ -271,7 +278,12 @@ export default function DashboardPage() {
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <div className="text-sm text-slate-300 mb-2">Prices</div>
                   {quotes.length ? (
-                    <PricePanel market={market} quotes={quotes} />
+                    <PricePanel
+                      market={market}
+                      quotes={quotes}
+                      value={symbol}
+                      onSelect={setSymbol}
+                    />
                   ) : (
                     <div className="text-xs text-slate-500">
                       No quotes available for this market.

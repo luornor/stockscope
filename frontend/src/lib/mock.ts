@@ -31,8 +31,8 @@ export const sectorHeatIntl: SectorSlice[] = [
 ];
 
 export const newsItems: NewsItem[] = [
-  { id: 1, source: "Bloomwire", title: "Markets edge higher on AI optimism", time: "12m" },
-  { id: 2, source: "Accra Ledger", title: "GSE weekly review: MTNGH leads volumes", time: "1h" },
-  { id: 3, source: "FinTimes", title: "Energy stocks dip as oil retreats", time: "2h" },
-  { id: 4, source: "TechPulse", title: "Chipmakers rally on data center demand", time: "3h" },
+  { id: 1, source: "Bloomwire", title: "Markets edge higher on AI optimism", url: "#", time: "12m" },
+  { id: 2, source: "Accra Ledger", title: "GSE weekly review: MTNGH leads volumes", url: "#", time: "1h" },
+  { id: 3, source: "FinTimes", title: "Energy stocks dip as oil retreats", url: "#", time: "2h" },
+  { id: 4, source: "TechPulse", title: "Chipmakers rally on data center demand", url: "#", time: "3h" },
 ];

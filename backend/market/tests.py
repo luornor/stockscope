@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from django.core.cache import cache
 from django.test import SimpleTestCase, override_settings
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from .providers import DEFAULT_KWAYISI_GSE_BASE, KwayisiGSEProvider, SymbolsProvider, _kwayisi_base
@@ -59,3 +60,23 @@ class KwayisiProviderTests(SimpleTestCase):
             set(response.json()[0].keys()),
             {"symbol", "name", "price", "change", "volume"},
         )
+
+    @patch("market.views.InternationalRssNewsProvider")
+    @patch("market.views.FinnhubNewsProvider")
+    def test_international_news_falls_back_to_rss(self, mock_finnhub, mock_rss):
+        mock_finnhub.return_value.company.return_value = []
+        mock_rss.return_value.fetch.return_value = [
+            {
+                "id": "rss-1",
+                "source": "RSS",
+                "title": "Markets climb",
+                "url": "https://example.com/markets-climb",
+                "published_at": timezone.now(),
+            }
+        ]
+
+        response = APIClient().get("/api/news?market=international&symbol=MSFT")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["title"], "Markets climb")
+        mock_rss.return_value.fetch.assert_called_once_with(limit=20, symbol="MSFT")

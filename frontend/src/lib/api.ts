@@ -1,5 +1,7 @@
-export const API_BASE =
+const rawApiBase =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+
+export const API_BASE = rawApiBase.replace(/\/+$/, "");
 
 async function doFetch(path: string, init?: RequestInit) {
   return fetch(`${API_BASE}${path}`, {
@@ -12,6 +14,17 @@ async function doFetch(path: string, init?: RequestInit) {
 async function tryRefresh() {
   const r = await doFetch("/api/auth/refresh", { method: "POST" });
   return r.ok;
+}
+
+function parseError(text: string, status: number) {
+  if (!text) return `HTTP ${status}`;
+  try {
+    const data = JSON.parse(text) as { detail?: string; error?: string };
+    return data.detail || data.error || text;
+  } catch {
+    const plain = text.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return plain || `HTTP ${status}`;
+  }
 }
 
 // shared handler with one retry
@@ -34,10 +47,10 @@ async function handle<T>(
     const again = await doFetch(path, init);
     if (again.ok) return again.json() as Promise<T>;
     const againText = await again.text();
-    throw new Error(againText || `HTTP ${again.status}`);
+    throw new Error(parseError(againText, again.status));
   }
 
-  throw new Error(text || `HTTP ${res.status}`);
+  throw new Error(parseError(text, res.status));
 }
 
 export async function apiGet<T = unknown>(path: string): Promise<T> {

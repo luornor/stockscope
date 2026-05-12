@@ -516,17 +516,15 @@ class FinnhubNewsProvider:
         }
 
 
-class GhanaRssNewsProvider:
-    FEEDS = [
-        "https://www.graphic.com.gh/business-news.html?format=feed&type=rss",
-        "https://www.ghanaweb.com/GhanaHomePage/business/rss/",
-        "https://www.myjoyonline.com/business/feed/",
-        "https://www.bog.gov.gh/category/news/feed/",
-        "https://www.ghana-stock-exchange.com/feed/",
-    ]
+class RssNewsProvider:
+    FEEDS: List[str] = []
+    CACHE_PREFIX = "news:rss"
 
-    def fetch(self, limit: int = 20) -> List[Dict[str, Any]]:
-        cache_key = f"news:ghana:rss:v1:{limit}"
+    def feeds(self, symbol: str = "") -> List[str]:
+        return self.FEEDS
+
+    def fetch(self, limit: int = 20, symbol: str = "") -> List[Dict[str, Any]]:
+        cache_key = f"{self.CACHE_PREFIX}:v2:{symbol.upper() or 'general'}:{limit}"
         cached = _cache_get(cache_key)
         if cached is not None:
             return cached
@@ -534,7 +532,7 @@ class GhanaRssNewsProvider:
             return []
 
         items: List[Dict[str, Any]] = []
-        for url in self.FEEDS:
+        for url in self.feeds(symbol):
             try:
                 response = _session.get(url, timeout=UPSTREAM_TIMEOUT)
                 response.raise_for_status()
@@ -546,6 +544,8 @@ class GhanaRssNewsProvider:
             for entry in entries:
                 title = getattr(entry, "title", "")
                 link = getattr(entry, "link", "")
+                if not title or not str(link).startswith(("http://", "https://")):
+                    continue
                 source = getattr(feed, "feed", {}).get("title", "RSS")
                 if hasattr(entry, "published_parsed") and entry.published_parsed:
                     ts = datetime.fromtimestamp(time.mktime(entry.published_parsed), tz=timezone.utc)
@@ -578,6 +578,34 @@ class GhanaRssNewsProvider:
 
         _cache_set(cache_key, out, 5 * 60)
         return out
+
+
+class InternationalRssNewsProvider(RssNewsProvider):
+    CACHE_PREFIX = "news:international:rss"
+    FEEDS = [
+        "https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US",
+        "https://www.marketwatch.com/rss/topstories",
+        "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    ]
+
+    def feeds(self, symbol: str = "") -> List[str]:
+        if symbol:
+            return [
+                f"https://feeds.finance.yahoo.com/rss/2.0/headline?s={symbol.upper()}&region=US&lang=en-US",
+                *self.FEEDS,
+            ]
+        return self.FEEDS
+
+
+class GhanaRssNewsProvider(RssNewsProvider):
+    CACHE_PREFIX = "news:ghana:rss"
+    FEEDS = [
+        "https://www.graphic.com.gh/business-news.html?format=feed&type=rss",
+        "https://www.ghanaweb.com/GhanaHomePage/business/rss/",
+        "https://www.myjoyonline.com/business/feed/",
+        "https://www.bog.gov.gh/category/news/feed/",
+        "https://www.ghana-stock-exchange.com/feed/",
+    ]
 
 
 class SymbolsProvider:

@@ -21,9 +21,13 @@ function pct(nPrice: number, nChange: number) {
 export function PricePanel({
   market,
   quotes,
+  value,
+  onSelect,
 }: {
   market: Market;
   quotes: Quote[];
+  value?: string;
+  onSelect?: (symbol: string) => void;
 }) {
   const label = market === "international" ? "International" : "Ghana";
   const accent =
@@ -62,11 +66,19 @@ export function PricePanel({
           const ch = Number(s.change ?? 0);
           const pctVal = pct(p, ch);
           const pos = pctVal >= 0;
+          const active = value === s.symbol;
 
           return (
-            <div
+            <button
               key={s.symbol}
-              className="rounded-xl border border-white/10 p-3 bg-white/5"
+              type="button"
+              onClick={() => onSelect?.(s.symbol)}
+              aria-pressed={active}
+              className={cx(
+                "rounded-xl border p-3 bg-white/5 text-left transition hover:bg-white/10",
+                active ? "border-cyan-400/50" : "border-white/10",
+                onSelect ? "cursor-pointer" : "cursor-default"
+              )}
             >
               {/* Top row: symbol/name on left, price on right */}
               <div className="flex items-start justify-between gap-3">
@@ -114,7 +126,7 @@ export function PricePanel({
                   </span>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

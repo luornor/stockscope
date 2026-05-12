@@ -13,7 +13,7 @@ from .symbols import get_symbols_for_market
 
 from .providers import (
     YahooIntradayProvider, KwayisiGhanaIntradayProvider,get_provider_for_market,
-    FinnhubNewsProvider, GhanaRssNewsProvider,SymbolsProvider
+    FinnhubNewsProvider, GhanaRssNewsProvider, InternationalRssNewsProvider, SymbolsProvider
 )
 from django.views.decorators.cache import cache_page
 
@@ -75,7 +75,10 @@ def news(request):
     Returns [{id, source, title, url, published_at}]
     """
     market = (request.query_params.get("market") or "international").lower()
-    limit = int(request.query_params.get("limit") or 20)
+    try:
+        limit = min(max(int(request.query_params.get("limit") or 20), 1), 50)
+    except (TypeError, ValueError):
+        limit = 20
     symbol = (request.query_params.get("symbol") or "").strip().upper()
 
     if market not in ("ghana", "international"):
@@ -90,6 +93,8 @@ def news(request):
             items = fin.company(symbol, days=7, limit=limit)
         else:
             items = fin.general(limit=limit)
+        if not items:
+            items = InternationalRssNewsProvider().fetch(limit=limit, symbol=symbol)
 
     ser = NewsItemSerializer(data=items, many=True)
     ser.is_valid(raise_exception=True)
@@ -198,5 +203,4 @@ def watchlist_delete(request, symbol: str):
         return Response({"detail":"market must be 'ghana' or 'international'."}, status=400)
     WatchlistItem.objects.filter(user=request.user, symbol=symbol.upper(), market=market).delete()
     return Response({"ok": True})
-
 

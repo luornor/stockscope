@@ -1,33 +1,51 @@
 "use client";
 import useSWR from "swr";
 import { apiGet } from "@/lib/api";
+import type { Market, NewsItem } from "@/lib/api-types";
 import { toRelative } from "@/lib/time";
 
-type NewsItem = {
+export type UiNews = NewsItem & {
   id: string;
-  source: string;
-  title: string;
-  url: string;
-  published_at: string;
-};
-export type UiNews = {
-  id: string;
-  source: string;
-  title: string;
-  url: string;
   time: string;
 };
 
-export function useNews(market: "ghana" | "international", symbol?: string) {
+function newsPath(market: Market, symbol?: string) {
   const qs = new URLSearchParams({ market, limit: "12" });
   if (symbol && market === "international") qs.set("symbol", symbol);
-  const key = `/api/news?${qs.toString()}`;
-  const { data, error, isLoading, mutate } = useSWR<NewsItem[]>(key, apiGet, {
-    refreshInterval: 60_000,
-  });
-  const items: UiNews[] = (data ?? []).map((n) => ({
-    ...n,
-    time: toRelative(n.published_at),
-  }));
-  return { news: items, error, isLoading, refresh: mutate };
+  return `/api/news?${qs.toString()}`;
+}
+
+function toUiNews(rows: NewsItem[]): UiNews[] {
+  return rows
+    .filter((n) => n.title && n.url)
+    .map((n) => ({
+      ...n,
+      id: String(n.id),
+      time: n.published_at ? toRelative(n.published_at) : "recently",
+    }));
+}
+
+export function useNews(market: Market, symbol?: string) {
+  const selectedSymbol = market === "international" ? symbol : undefined;
+  const key = newsPath(market, selectedSymbol);
+
+  const { data, error, isLoading, mutate } = useSWR<UiNews[]>(
+    key,
+    async () => {
+      const primary = await apiGet<NewsItem[]>(key).catch(() => []);
+      if (primary.length || !selectedSymbol) return toUiNews(primary);
+
+      const general = await apiGet<NewsItem[]>(newsPath(market)).catch(
+        () => []
+      );
+      return toUiNews(general);
+    },
+    {
+      dedupingInterval: 60_000,
+      refreshInterval: 5 * 60_000,
+      revalidateOnFocus: false,
+    }
+  );
+
+  return { news: data ?? [], error, isLoading, refresh: mutate };
 }
